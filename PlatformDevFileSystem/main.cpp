@@ -2,13 +2,21 @@
 #include "FileSystem.h"
 #include <fstream>
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+#define PATH "C:/Users/woodz/Source/Repos/PlatDev/PlatformDevFileSystem/PlatformDevFileSystem/test"
+#elif defined(unix) || defined(__unix) || defined(__unix__)
+#define PATH "/home/wouter/PD"
+#else
+#define PATH 0
+#endif
 
 int main()
 {
 	FileSystem fs = FileSystem();
 	std::vector<File*> vec, vec2;
+	if (PATH == 0) { std::cout << "Unknown OS" << std::endl; return 0; }
 	std::cout << "Mount" << std::endl;
-	fs.MountDirectory("C:/Users/woodz/Source/Repos/PlatDev/PlatformDevFileSystem/Debug/test");
+	fs.MountDirectory(PATH);
 	std::cout << "List" << std::endl;
 	fs.ListContent();
 	std::cout << "Find Files" << std::endl;

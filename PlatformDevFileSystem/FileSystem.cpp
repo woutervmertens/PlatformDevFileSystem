@@ -10,6 +10,7 @@
 #include <windows.h>
 void FileSystem::MountDirectory(const std::string & directory, Item * curDir)
 {
+	std::cout << "Windows detected" << std::endl;
 	Item* tempD;
 	if (curDir->GetName() == directory) //Check if root
 	{
@@ -52,13 +53,14 @@ void FileSystem::MountDirectory(const std::string & directory, Item * curDir)
 		}
 	} while (FindNextFileA(handle, &find_data) != 0);
 }
-#else
+#elif defined(unix) || defined(__unix) || defined(__unix__)
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 void FileSystem::MountDirectory(const std::string & directory, Item * curDir)
 {
+	std::cout << "Ubuntu detected" << std::endl;
 	Item* tempD;
 	if (curDir->GetName() == directory) //Check if root
 	{
@@ -74,7 +76,7 @@ void FileSystem::MountDirectory(const std::string & directory, Item * curDir)
 	struct dirent * find_data;
 
 	std::string path = (curDir->GetName() == directory) ? "" : (curDir->GetFullPath() + "/");//check if root, if no add full path
-	dPtr = opendir((path + directory + "/*").c_str());
+	dPtr = opendir((path + directory + "/").c_str());
 	if (dPtr == NULL)
 	{
 		std::cerr << "Unmountable path: " << directory.c_str() << std::endl;
@@ -84,11 +86,11 @@ void FileSystem::MountDirectory(const std::string & directory, Item * curDir)
 	if (directory == "") std::cout << "Root is ready!" << std::endl;
 	else std::cout << directory.c_str() << " is mounted!" << std::endl;
 	//if directory is mountable, loop through items and stuff
-	do
+	while ((find_data = readdir(dPtr)) != NULL)
 	{
 		struct stat statBuffer;
 		stat((path + directory + "/" + find_data->d_name).c_str(), &statBuffer);
-		if (S_ISDIR(statBuffer.st_mode) == 0)//error gives -1 with errno (but skip for now)
+		if (S_ISDIR(statBuffer.st_mode))//error gives -1 with errno (but skip for now)
 		{
 			if (strcmp(find_data->d_name, ".") == 0 || strcmp(find_data->d_name, "..") == 0)
 			{
@@ -101,7 +103,7 @@ void FileSystem::MountDirectory(const std::string & directory, Item * curDir)
 			static_cast<Directory*>(tempD)->m_Files.push_back(new File(find_data->d_name, tempD));
 
 		}
-	} while ((find_data = readdir(dPtr)) != NULL);
+	} 
 }
 #endif
 
@@ -225,10 +227,13 @@ void FileSystem::GetFilesVec(std::vector<File*>& file_table, Item* folder, const
 			if (extension != "")//for find all with extension
 			{
 				size_t pos = item->GetName().find_last_of(".");
-				std::string sub = item->GetName().substr(pos);
-				if (item->GetName().substr(pos) == extension) {
-					file_table.push_back(static_cast<File*>(item));
-					std::cout << item->GetName() << std::endl;
+				if(pos != SIZE_MAX)
+				{
+					std::string sub = item->GetName().substr(pos);
+					if (item->GetName().substr(pos) == extension) {
+						file_table.push_back(static_cast<File*>(item));
+						std::cout << item->GetName() << std::endl;
+					}
 				}
 			}
 			else//just add, #NoFilter
