@@ -3,7 +3,7 @@
 #include <fstream>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-#define PATH "C:/Users/woodz/Source/Repos/PlatDev/PlatformDevFileSystem/PlatformDevFileSystem/test"
+#define PATH "H:/repos/PlatformDevFileSystem/PlatformDevFileSystem/test"
 #elif defined(unix) || defined(__unix) || defined(__unix__)
 #define PATH "/home/wouter/PD"
 #else

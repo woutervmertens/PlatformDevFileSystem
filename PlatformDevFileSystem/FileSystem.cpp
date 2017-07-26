@@ -56,7 +56,10 @@ void FileSystem::MountDirectory(const std::string & directory, Item * curDir)
 #elif defined(__APPLE__) //Check for apple
 	#include "TargetConditionals.h"
 	#if TARGET_OS_MAC //Check for mac
-	
+	#include <dirent.h>
+	#include <sys/types.h>
+	#include <sys/stat.h>
+	#include <unistd.h>
 	//Dir starts at /System then probably /Users
 	void FileSystem::MountDirectory(const std::string & directory, Item * curDir)
 	{
@@ -71,40 +74,43 @@ void FileSystem::MountDirectory(const std::string & directory, Item * curDir)
 			tempD = new Directory(directory, curDir);
 			static_cast<Directory*>(curDir)->m_Files.push_back(tempD); //add dir to parent (old root)
 		}
-	
-		//curDir = tempD; //make new root
-	
-		WIN32_FIND_DATAA find_data;
+
+		DIR *dPtr; //Directory pointer
+		struct dirent * find_data;
+
 		std::string path = (curDir->GetName() == directory) ? "" : (curDir->GetFullPath() + "/");//check if root, if no add full path
-		auto handle = FindFirstFileA((path + directory + "/*").c_str(), &find_data); //get first file "."(is directory itself) to check if directory actually exists
-		if (handle == INVALID_HANDLE_VALUE)
+		dPtr = opendir((path + directory + "/").c_str());
+		if (dPtr == NULL)
 		{
 			std::cerr << "Unmountable path: " << directory.c_str() << std::endl;
 			return;
 		}
-	
+
 		if (directory == "") std::cout << "Root is ready!" << std::endl;
 		else std::cout << directory.c_str() << " is mounted!" << std::endl;
 		//if directory is mountable, loop through items and stuff
-		do
+		while ((find_data = readdir(dPtr)) != NULL)
 		{
-			if (find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)//bitwise flag checker(like enum)(elements example in class)
+			struct stat statBuffer;
+			stat((path + directory + "/" + find_data->d_name).c_str(), &statBuffer);
+			if (S_ISDIR(statBuffer.st_mode))//error gives -1 with errno (but skip for now)
 			{
-				if (strcmp(find_data.cFileName, ".") == 0 || strcmp(find_data.cFileName, "..") == 0)//Not needed for windows, maybe for cygwin
+				if (strcmp(find_data->d_name, ".") == 0 || strcmp(find_data->d_name, "..") == 0)
 				{
 					continue; //if you don't do this it'll get stuck on these folders (it's only 2 files)
 				}
-				MountDirectory(find_data.cFileName, tempD); //only send filename because we want to level it in 1 root
+				MountDirectory(find_data->d_name, tempD); //only send filename because we want to level it in 1 root
 			}
 			else
 			{
-				static_cast<Directory*>(tempD)->m_Files.push_back(new File(find_data.cFileName, tempD));
-	
+				static_cast<Directory*>(tempD)->m_Files.push_back(new File(find_data->d_name, tempD));
+
 			}
-		} while (FindNextFileA(handle, &find_data) != 0);
+		}
 	}
 	#else
 		std::cout << "Unsupported MacOS detected" << std::endl;
+	#endif
 #elif defined(unix) || defined(__unix) || defined(__unix__)//Might run on mac aswell (based on unix)
 #include <dirent.h>
 #include <sys/types.h>
