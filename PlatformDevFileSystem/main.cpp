@@ -4,8 +4,12 @@
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 #define PATH "H:/repos/PlatformDevFileSystem/PlatformDevFileSystem/test"
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(macintosh) || defined(__MACH__) //apple and mach for os x, macintosh for os 9, not sure about use __OSX__
+#include "TargetConditionals.h"
+#if TARGET_OS_MAC //Check for mac
 #define PATH "/Volumes/VMware\ Shared\ Folders/PD"
+#define MACOS
+#endif
 #elif defined(unix) || defined(__unix) || defined(__unix__)
 #define PATH "/home/wouter/PD"
 #else

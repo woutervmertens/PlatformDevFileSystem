@@ -63,62 +63,14 @@ void FileSystem::MountDirectory(const std::string & directory, Item * curDir)
 		}
 	} while (FindNextFileA(handle, &find_data) != 0);
 }
-#elif defined(__APPLE__) //Check for apple
-	#include "TargetConditionals.h"
-	#if TARGET_OS_MAC //Check for mac
-	#include <dirent.h>
-	#include <sys/types.h>
-	#include <sys/stat.h>
-	#include <unistd.h>
-	//Dir starts at /System then probably /Users
-	void FileSystem::MountDirectory(const std::string & directory, Item * curDir)
-	{
-		O("MacOS detected")
-		CHECKROOT
-
-		DIR *dPtr; //Directory pointer
-		struct dirent * find_data;
-
-		std::string path = (curDir->GetName() == directory) ? "" : (curDir->GetFullPath() + "/");//check if root, if no add full path
-		dPtr = opendir((path + directory + "/").c_str());
-		if (dPtr == NULL)
-		{
-			UNMOUNTABLEPATH
-			return;
-		}
-
-		DIRECTORYCHECK
-		//if directory is mountable, loop through items and stuff
-		while ((find_data = readdir(dPtr)) != NULL)
-		{
-			struct stat statBuffer;
-			stat((path + directory + "/" + find_data->d_name).c_str(), &statBuffer);
-			if (S_ISDIR(statBuffer.st_mode))//error gives -1 with errno (but skip for now)
-			{
-				if (strcmp(find_data->d_name, ".") == 0 || strcmp(find_data->d_name, "..") == 0)
-				{
-					continue; //if you don't do this it'll get stuck on these folders (it's only 2 files)
-				}
-				MountDirectory(find_data->d_name, tempD); //only send filename because we want to level it in 1 root
-			}
-			else
-			{
-				static_cast<Directory*>(tempD)->m_Files.push_back(new File(find_data->d_name, tempD));
-
-			}
-		}
-	}
-	#else
-		O("Unsupported MacOS detected")
-	#endif
-#elif defined(unix) || defined(__unix) || defined(__unix__)//Might run on mac aswell (based on unix)
+#elif defined(unix) || defined(__unix) || defined(__unix__) || defined(MACOS)
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 void FileSystem::MountDirectory(const std::string & directory, Item * curDir)
 {
-	O("Ubuntu detected")
+	O("Unix detected")
 	CHECKROOT
 
 	DIR *dPtr; //Directory pointer
