@@ -63,7 +63,7 @@ void FileSystem::MountDirectory(const std::string & directory, Item * curDir)
 		}
 	} while (FindNextFileA(handle, &find_data) != 0);
 }
-#elif defined(unix) || defined(__unix) || defined(__unix__) || defined(MACOS)
+#elif defined(unix) || defined(__unix) || defined(__unix__) || defined(__APPLE__)
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>

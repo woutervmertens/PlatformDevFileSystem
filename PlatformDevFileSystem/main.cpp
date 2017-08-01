@@ -8,7 +8,8 @@
 #include "TargetConditionals.h"
 #if TARGET_OS_MAC //Check for mac
 #define PATH "/Volumes/VMware\ Shared\ Folders/PD"
-#define MACOS
+#else
+#define PATH 0
 #endif
 #elif defined(unix) || defined(__unix) || defined(__unix__)
 #define PATH "/home/wouter/PD"

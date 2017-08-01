@@ -1,8 +1,3 @@
-in the terminal, mount shared folder:
-	mount -t vboxsf /foldername ./mntpoint
-where ./mntpoint is f.e. /Volumes/smb
-(kinda same as linux)
-
 	cd /Volumes/VMware\ Shared\ Folders/PD/
 run:
 	g++ -std=c++11 *.cpp -o test.out
