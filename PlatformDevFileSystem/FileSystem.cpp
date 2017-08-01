@@ -154,29 +154,6 @@ void FileSystem::MountDirectory(const std::string & directory, Item * curDir)
 }
 #endif
 
-
-FileSystem::FileSystem()
-{
-}
-
-
-FileSystem::~FileSystem()
-{
-}
-
-void FileSystem::MountDirectory(const std::string & directory)//Avoiding making new variable for current dir
-{
-	m_Root = new Directory(directory, nullptr);
-	MountDirectory(directory, m_Root);
-}
-
-
-
-void FileSystem::ListContents()//Feedback for testing
-{
-	ListContents(m_Root);
-}
-
 void FileSystem::ListContents(Item * folder)//Feedback for testing
 {
 	Directory * targetFolder = dynamic_cast<Directory*>(folder);
@@ -190,11 +167,6 @@ void FileSystem::ListContents(Item * folder)//Feedback for testing
 			ListContents(temp);
 	}
 	
-}
-
-File* FileSystem::GetFile(const std::string & filename) const
-{
-	return GetFile(filename,m_Root);
 }
 
 File* FileSystem::GetFile(const std::string & filename,Item* folder) const
@@ -220,11 +192,6 @@ File* FileSystem::GetFile(const std::string & filename,Item* folder) const
 	return nullptr;
 }
 
-Directory* FileSystem::GetDirectory(const std::string & dname) const
-{
-	return GetDirectory(dname, m_Root);
-}
-
 Directory* FileSystem::GetDirectory(const std::string & dname, Item* folder) const
 {
 	Directory * targetFolder = dynamic_cast<Directory*>(folder);
@@ -246,20 +213,6 @@ Directory* FileSystem::GetDirectory(const std::string & dname, Item* folder) con
 		}
 	}
 	return nullptr;
-}
-void FileSystem::GetFilesVec(std::vector<File*>& file_table) const
-{
-	GetFilesVec(file_table, m_Root);
-}
-
-void FileSystem::GetFilesVec(std::vector<File*>& file_table, const std::string& extension) const
-{
-	GetFilesVec(file_table, m_Root, extension);
-}
-
-void FileSystem::GetFilesVec(std::vector<File*>& file_table, Item* folder) const
-{
-	GetFilesVec(file_table, folder, "");
 }
 
 void FileSystem::GetFilesVec(std::vector<File*>& file_table, Item* folder, const std::string& extension) const
@@ -314,12 +267,6 @@ void FileSystem::GetFilesInDirectory(std::vector<File*>& file_table, const std::
 		}
 	}
 }
-void FileSystem::GetFilesWithExtension(std::vector<File*>& file_table, const std::string& extension) const
-{
-	GetFilesVec(file_table, extension);
-}
-
-
 
 std::fstream FileSystem::OpenFile(const std::string& filename, FileMode mode)
 {

@@ -8,26 +8,26 @@
 class FileSystem
 {
 public:
-	FileSystem();
-	~FileSystem();
+	FileSystem(){}
+	~FileSystem() {}
 
 	Item * m_Root = new Directory("", nullptr);
 
-	void MountDirectory(const std::string & directory);
+	void MountDirectory(const std::string & directory){ m_Root = new Directory(directory, nullptr); MountDirectory(directory, m_Root);}//Avoiding making new variable for current dir
 	void MountDirectory(const std::string & directory, Item* curDir);
-	void ListContents();
+	void ListContents() { ListContents(m_Root); }//Feedback for testing
 	void ListContents(Item * folder);
-	File* GetFile(const std::string & filename) const;
+	File* GetFile(const std::string & filename) const { return GetFile(filename, m_Root); }
 	File* GetFile(const std::string & filename,Item * folder) const;
-	Directory* GetDirectory(const std::string & filename) const;
+	Directory* GetDirectory(const std::string & filename) const{ return GetDirectory (filename, m_Root); }
 	Directory* GetDirectory(const std::string & filename, Item* folder) const;
-	void GetFilesVec(std::vector<File*>& file_table) const;
-	void GetFilesVec(std::vector<File *>& file_table, const std::string & extension) const;
-	void GetFilesVec(std::vector<File*>& file_table, Item* folder) const;
+	void GetFilesVec(std::vector<File*>& file_table) const { GetFilesVec(file_table, m_Root); }
+	void GetFilesVec(std::vector<File *>& file_table, const std::string & extension) const { GetFilesVec(file_table, m_Root, extension); }
+	void GetFilesVec(std::vector<File*>& file_table, Item* folder) const { GetFilesVec(file_table, folder, ""); }
 	void GetFilesVec(std::vector<File*>& file_table, Item* folder, const std::string & extension) const;
 	std::string GetPhysicalFilePath(const std::string & filename) const;
 	void GetFilesInDirectory(std::vector<File*> & file_table, const std::string & directory) const;
-	void GetFilesWithExtension(std::vector<File*> & file_table, const std::string & extension) const;
+	void GetFilesWithExtension(std::vector<File*> & file_table, const std::string & extension) const { GetFilesVec(file_table, extension); }
 	std::fstream OpenFile(const std::string & filename, FileMode mode);//fstream is limitation, won't work for network files
 };
 
