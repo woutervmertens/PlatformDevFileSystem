@@ -1,0 +1,9 @@
+in the terminal, mount shared folder:
+	mount -t vboxsf /foldername ./mntpoint
+where ./mntpoint is f.e. /Volumes/smb
+(kinda same as linux)
+
+	cd /Volumes/VMware\ Shared\ Folders/PD/
+run:
+	$ g++ -o testexe main.cpp
+	$ ./testexe
