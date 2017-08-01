@@ -18,7 +18,7 @@ int main()
 	std::cout << "Mount" << std::endl;
 	fs.MountDirectory(PATH);
 	std::cout << "List" << std::endl;
-	fs.ListContent();
+	fs.ListContents();
 	std::cout << "Find Files" << std::endl;
 	std::cout << "File found: " <<  fs.GetPhysicalFilePath("jup.txt") << std::endl;
 	std::cout << "File found: " << fs.GetPhysicalFilePath("eyyyy.txt") << std::endl;

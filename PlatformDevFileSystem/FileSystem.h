@@ -15,8 +15,8 @@ public:
 
 	void MountDirectory(const std::string & directory);
 	void MountDirectory(const std::string & directory, Item* curDir);
-	void ListContent();
-	void ListContent(Item * folder);
+	void ListContents();
+	void ListContents(Item * folder);
 	File* GetFile(const std::string & filename) const;
 	File* GetFile(const std::string & filename,Item * folder) const;
 	Directory* GetDirectory(const std::string & filename) const;

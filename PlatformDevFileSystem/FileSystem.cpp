@@ -5,36 +5,45 @@
 #include <iostream>
 #include <fstream>
 
+#define CHECKROOT Item* tempD;																		\
+	if (curDir->GetName() == directory) /*Check if root*/											\
+	{																								\
+		tempD = curDir;																				\
+	}																								\
+	else {																							\
+		tempD = new Directory(directory, curDir);													\
+		static_cast<Directory*>(curDir)->m_Files.push_back(tempD); /*add dir to parent (old root)*/	\
+	}
+
+#define UNMOUNTABLEPATH std::cerr << "Unmountable path: " << directory.c_str() << std::endl;
+
+#define DIRECTORYCHECK if (directory == "") std::cout << "Root is ready!" << std::endl; \
+	else std::cout << directory.c_str() << " is mounted!" << std::endl;
+
+#define O(str) std::cout << str << std::endl;
+
 //__CYGWIN__ is linux environment on windows
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 #include <windows.h>
 void FileSystem::MountDirectory(const std::string & directory, Item * curDir)
 {
-	std::cout << "Windows detected" << std::endl;
-	Item* tempD;
-	if (curDir->GetName() == directory) //Check if root
-	{
-		tempD = curDir;
-	}
-	else
-	{
-		tempD = new Directory(directory, curDir);
-		static_cast<Directory*>(curDir)->m_Files.push_back(tempD); //add dir to parent (old root)
-	}
+	O("Windows detected")
+	CHECKROOT
 
 	//curDir = tempD; //make new root
 
 	WIN32_FIND_DATAA find_data;
-	std::string path = (curDir->GetName() == directory) ? "" : (curDir->GetFullPath() + "/");//check if root, if no add full path
+	std::string path;
+	if (curDir->GetName() == directory) path = ""; //check if root, if no add full path
+	else path = (curDir->GetFullPath() + "/");
 	auto handle = FindFirstFileA((path + directory + "/*").c_str(), &find_data); //get first file "."(is directory itself) to check if directory actually exists
 	if (handle == INVALID_HANDLE_VALUE)
 	{
-		std::cerr << "Unmountable path: " << directory.c_str() << std::endl;
+		UNMOUNTABLEPATH
 		return;
 	}
 
-	if (directory == "") std::cout << "Root is ready!" << std::endl;
-	else std::cout << directory.c_str() << " is mounted!" << std::endl;
+	DIRECTORYCHECK
 	//if directory is mountable, loop through items and stuff
 	do
 	{
@@ -63,17 +72,8 @@ void FileSystem::MountDirectory(const std::string & directory, Item * curDir)
 	//Dir starts at /System then probably /Users
 	void FileSystem::MountDirectory(const std::string & directory, Item * curDir)
 	{
-		std::cout << "MacOS detected" << std::endl;
-		Item* tempD;
-		if (curDir->GetName() == directory) //Check if root
-		{
-			tempD = curDir;
-		}
-		else
-		{
-			tempD = new Directory(directory, curDir);
-			static_cast<Directory*>(curDir)->m_Files.push_back(tempD); //add dir to parent (old root)
-		}
+		O("MacOS detected")
+		CHECKROOT
 
 		DIR *dPtr; //Directory pointer
 		struct dirent * find_data;
@@ -82,12 +82,11 @@ void FileSystem::MountDirectory(const std::string & directory, Item * curDir)
 		dPtr = opendir((path + directory + "/").c_str());
 		if (dPtr == NULL)
 		{
-			std::cerr << "Unmountable path: " << directory.c_str() << std::endl;
+			UNMOUNTABLEPATH
 			return;
 		}
 
-		if (directory == "") std::cout << "Root is ready!" << std::endl;
-		else std::cout << directory.c_str() << " is mounted!" << std::endl;
+		DIRECTORYCHECK
 		//if directory is mountable, loop through items and stuff
 		while ((find_data = readdir(dPtr)) != NULL)
 		{
@@ -109,7 +108,7 @@ void FileSystem::MountDirectory(const std::string & directory, Item * curDir)
 		}
 	}
 	#else
-		std::cout << "Unsupported MacOS detected" << std::endl;
+		O("Unsupported MacOS detected")
 	#endif
 #elif defined(unix) || defined(__unix) || defined(__unix__)//Might run on mac aswell (based on unix)
 #include <dirent.h>
@@ -118,17 +117,8 @@ void FileSystem::MountDirectory(const std::string & directory, Item * curDir)
 #include <unistd.h>
 void FileSystem::MountDirectory(const std::string & directory, Item * curDir)
 {
-	std::cout << "Ubuntu detected" << std::endl;
-	Item* tempD;
-	if (curDir->GetName() == directory) //Check if root
-	{
-		tempD = curDir;
-	}
-	else
-	{
-		tempD = new Directory(directory, curDir);
-		static_cast<Directory*>(curDir)->m_Files.push_back(tempD); //add dir to parent (old root)
-	}
+	O("Ubuntu detected")
+	CHECKROOT
 
 	DIR *dPtr; //Directory pointer
 	struct dirent * find_data;
@@ -137,12 +127,11 @@ void FileSystem::MountDirectory(const std::string & directory, Item * curDir)
 	dPtr = opendir((path + directory + "/").c_str());
 	if (dPtr == NULL)
 	{
-		std::cerr << "Unmountable path: " << directory.c_str() << std::endl;
+		UNMOUNTABLEPATH
 		return;
 	}
 
-	if (directory == "") std::cout << "Root is ready!" << std::endl;
-	else std::cout << directory.c_str() << " is mounted!" << std::endl;
+	DIRECTORYCHECK
 	//if directory is mountable, loop through items and stuff
 	while ((find_data = readdir(dPtr)) != NULL)
 	{
@@ -183,12 +172,12 @@ void FileSystem::MountDirectory(const std::string & directory)//Avoiding making 
 
 
 
-void FileSystem::ListContent()//Feedback for testing
+void FileSystem::ListContents()//Feedback for testing
 {
-	ListContent(m_Root);
+	ListContents(m_Root);
 }
 
-void FileSystem::ListContent(Item * folder)//Feedback for testing
+void FileSystem::ListContents(Item * folder)//Feedback for testing
 {
 	Directory * targetFolder = dynamic_cast<Directory*>(folder);
 	if (targetFolder == nullptr) return;
@@ -198,7 +187,7 @@ void FileSystem::ListContent(Item * folder)//Feedback for testing
 		if (temp == nullptr)
 			std::cout << item->GetFullPath() << std::endl;
 		else
-			ListContent(temp);
+			ListContents(temp);
 	}
 	
 }
@@ -290,14 +279,14 @@ void FileSystem::GetFilesVec(std::vector<File*>& file_table, Item* folder, const
 					std::string sub = item->GetName().substr(pos);
 					if (item->GetName().substr(pos) == extension) {
 						file_table.push_back(static_cast<File*>(item));
-						std::cout << item->GetName() << std::endl;
+						O(item->GetName())
 					}
 				}
 			}
 			else//just add, #NoFilter
 			{
 				file_table.push_back(static_cast<File*>(item));
-				std::cout << item->GetName() << std::endl;
+				O(item->GetName())
 			}
 		}
 		else//go into folders
