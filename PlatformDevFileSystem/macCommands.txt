@@ -5,6 +5,5 @@ where ./mntpoint is f.e. /Volumes/smb
 
 	cd /Volumes/VMware\ Shared\ Folders/PD/
 run:
-	xcrun clang++ -std=c++11 -stdlib=libstdc++ -Wno-everything main.cpp
-	$ g++ -o testexe main.cpp
-	$ ./testexe
+	g++ -std=c++11 *.cpp -o test.out
+	./test.out

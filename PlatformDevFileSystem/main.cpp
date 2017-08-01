@@ -5,7 +5,7 @@
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 #define PATH "H:/repos/PlatformDevFileSystem/PlatformDevFileSystem/test"
 #elif defined(__APPLE__)
-#define PATH "/Volumes/VMWare/ Shared/ Folders/PD"
+#define PATH "/Volumes/VMware\ Shared\ Folders/PD"
 #elif defined(unix) || defined(__unix) || defined(__unix__)
 #define PATH "/home/wouter/PD"
 #else
