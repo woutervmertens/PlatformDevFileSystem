@@ -268,10 +268,10 @@ void FileSystem::GetFilesInDirectory(std::vector<File*>& file_table, const std::
 	}
 }
 
-std::fstream FileSystem::OpenFile(const std::string& filename, FileMode mode)
+void FileSystem::OpenFile(const std::string& filename, FileMode mode, std::fstream &fileStream)
 {
 	File* targetFile = GetFile(filename);
-	std::fstream fileStream;
+	//std::fstream fileStream;
 	switch (mode)
 	{
 	case FileMode::Read:
@@ -286,5 +286,5 @@ std::fstream FileSystem::OpenFile(const std::string& filename, FileMode mode)
 	default:
 		throw "Unknown mode";
 	}
-	return fileStream;
+	//return fileStream;
 }

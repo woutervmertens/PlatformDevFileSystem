@@ -31,7 +31,8 @@ int main()
 ;;;;std::cout << "Get files with extension .txt" << std::endl;
 ;;;;fs.GetFilesWithExtension(vec2, ".txt");
 ;;;;std::cout << "Open file" << std::endl;
-;;;;std::fstream JupFile = fs.OpenFile("jup.txt",FileMode::Read);
+;;;;std::fstream JupFile;
+;;;;fs.OpenFile("jup.txt", FileMode::Read, JupFile);
 ;;;;std::string line;
 ;;;;if(JupFile.is_open()){
 ;;;;;;;;while(std::getline(JupFile, line)){
