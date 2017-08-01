@@ -28,6 +28,6 @@ public:
 	std::string GetPhysicalFilePath(const std::string & filename) const;
 	void GetFilesInDirectory(std::vector<File*> & file_table, const std::string & directory) const;
 	void GetFilesWithExtension(std::vector<File*> & file_table, const std::string & extension) const { GetFilesVec(file_table, extension); }
-	void OpenFile(const std::string & filename, FileMode mode, std::fstream &in);//fstream is limitation, won't work for network files
+	void OpenFile(const std::string & filename, const FileMode mode, std::fstream &in);//fstream is limitation, won't work for network files
 };
 

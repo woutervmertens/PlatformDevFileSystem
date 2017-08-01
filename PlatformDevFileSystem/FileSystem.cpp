@@ -4,6 +4,7 @@
 #include "FileSystem.h"
 #include <iostream>
 #include <fstream>
+#include "FileMode.h"
 
 #define CHECKROOT Item* tempD;																		\
 	if (curDir->GetName() == directory) /*Check if root*/											\
@@ -268,7 +269,7 @@ void FileSystem::GetFilesInDirectory(std::vector<File*>& file_table, const std::
 	}
 }
 
-void FileSystem::OpenFile(const std::string& filename, FileMode mode, std::fstream &fileStream)
+void FileSystem::OpenFile(const std::string& filename, const FileMode mode, std::fstream &fileStream)
 {
 	File* targetFile = GetFile(filename);
 	//std::fstream fileStream;
